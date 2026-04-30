@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
+    <title>ListKu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --blue: #1A56FF;
+            --blue-dark: #1240D4;
+            --blue-light: #EEF2FF;
+            --sidebar-w: 200px;
+            --white: #ffffff;
+            --gray-50: #F8F9FC;
+            --gray-100: #F1F3F9;
+            --gray-200: #E4E8F0;
+            --gray-400: #9AA3B8;
+            --gray-600: #5A6480;
+            --gray-800: #1E2540;
+            --pending: #FF6B6B;
+            --dispatch: #1A56FF;
+            --completed: #22C55E;
+            --radius: 16px;
+            --shadow: 0 4px 24px rgba(26,86,255,0.08);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--blue);
+            display: flex;
+            flex-direction: column;
+            padding: 28px 0;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 22px;
+            color: var(--white);
+            padding: 0 24px 32px;
+            letter-spacing: -0.5px;
+        }
+        .logo span { color: rgba(255,255,255,0.55); }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.4);
+            padding: 0 24px 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            color: rgba(255,255,255,0.65);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all .2s;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+        }
+        .nav-item i { font-size: 16px; width: 20px; text-align: center; }
+        .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.08); }
+        .nav-item.active {
+            color: var(--white);
+            background: rgba(255,255,255,0.15);
+            border-left-color: var(--white);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px 24px;
+            display: flex;
+            gap: 12px;
+        }
+        .sidebar-footer a {
+            color: rgba(255,255,255,0.4);
+            font-size: 11px;
+            text-decoration: none;
+            transition: color .2s;
+        }
+        .sidebar-footer a:hover { color: var(--white); }
+
+        /* ── MAIN ── */
+        .main {
+            margin-left: var(--sidebar-w);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── TOPBAR ── */
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .icon-btn {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            border: none;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--gray-600);
+            font-size: 15px;
+            transition: background .2s;
+        }
+        .icon-btn:hover { background: var(--gray-200); }
+        .avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--blue);
+        }
+        .avatar-wrap {
+            display: flex; align-items: center; gap: 6px;
+            cursor: pointer;
+        }
+        .avatar-caret { color: var(--gray-400); font-size: 12px; }
+
+        /* ── CONTENT ── */
+        .content { padding: 28px 32px; flex: 1; }
+
+        /* ── TABS + FILTERS ── */
+        .tabs {
+            display: flex;
+            gap: 4px;
+        }
+        .tab {
+            padding: 7px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-400);
+            cursor: pointer;
+            border: none;
+            background: none;
+            transition: all .2s;
+        }
+        .tab:hover { color: var(--gray-800); }
+        .tab.active {
+            background: var(--blue);
+            color: var(--white);
+        }
+
+        .date-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 7px 14px;
+            font-size: 12.5px;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: border-color .2s;
+        }
+        .date-filter:hover { border-color: var(--blue); }
+        .date-filter i { color: var(--blue); font-size: 13px; }
+        .date-sep { color: var(--gray-400); margin: 0 4px; }
+
+        /* ── TABLE ── */
+        .table-wrap {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 13px 16px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--gray-400);
+            letter-spacing: 0.4px;
+            border-bottom: 1px solid var(--gray-100);
+            white-space: nowrap;
+        }
+        thead th.sortable { cursor: pointer; }
+        thead th.sortable i { font-size: 10px; margin-left: 4px; color: var(--gray-400); }
+
+        tbody tr {
+            border-bottom: 1px solid var(--gray-100);
+            transition: background .15s;
+        }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--gray-50); }
+        tbody tr.highlight { background: var(--blue); }
+        tbody tr.highlight td { color: var(--white); }
+        tbody tr.highlight .status-badge.dispatch { background: rgba(255,255,255,0.25); color: var(--white); }
+        tbody tr.highlight .row-action { color: var(--white); opacity: .7; }
+        tbody tr.highlight .row-action:hover { opacity: 1; }
+
+        td {
+            padding: 14px 16px;
+            font-size: 13.5px;
+            color: var(--gray-800);
+            vertical-align: middle;
+        }
+
+        .order-id {
+            font-weight: 700;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px;
+        }
+
+        .user-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: var(--gray-200);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            font-size: 12px;
+            color: var(--blue);
+        }
+        .user-name { font-weight: 500; }
+
+        .address-cell {
+            color: var(--gray-600);
+            font-size: 12.5px;
+            max-width: 220px;
+        }
+
+        .price-cell { font-weight: 700; }
+
+        /* badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .status-badge::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .status-badge.pending { background: #FFF0F0; color: var(--pending); }
+        .status-badge.pending::before { background: var(--pending); }
+        .status-badge.dispatch { background: var(--blue-light); color: var(--blue); }
+        .status-badge.dispatch::before { background: var(--blue); }
+        .status-badge.completed { background: #F0FDF4; color: var(--completed); }
+        .status-badge.completed::before { background: var(--completed); }
+
+        .actions-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .row-action {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            background: var(--gray-100);
+            border: none;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--gray-600);
+            font-size: 13px;
+            transition: all .2s;
+        }
+        .row-action:hover { background: var(--blue); color: var(--white); }
+
+        /* ── PAGINATION ── */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-top: 1px solid var(--gray-100);
+        }
+        .pagination-info { font-size: 12.5px; color: var(--gray-400); }
+        .pagination-btns { display: flex; gap: 4px; }
+        .page-btn {
+            width: 30px; height: 30px;
+            border-radius: 7px;
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+            font-size: 12.5px;
+            color: var(--gray-600);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all .2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .page-btn:hover { border-color: var(--blue); color: var(--blue); }
+        .page-btn.active { background: var(--blue); border-color: var(--blue); color: var(--white); }
+        .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        /* ── ANIMATE ── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .table-wrap { animation: fadeUp .35s ease both; }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="logo">L<span>ist</span>K<span>u</span></div>
+
+    <span class="nav-label">Menu</span>
+    <a class="nav-item" href="#"><i class="fa-solid fa-list-ul"></i>Daftar</a>
+    <a class="nav-item active" href="#"><i class="fa-solid fa-plus"></i>Tambah</a>
+
+    <div class="sidebar-footer">
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">Google</a>
+    </div>
+</aside>
+
+
+
+<!-- MAIN -->
+<div class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="page-title">Daftar Barang</div>
+        <div class="topbar-right">
+            <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+            <button class="icon-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+            <div class="avatar-wrap">
+                <div style="width:36px;height:36px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:14px;">A</div>
+                <i class="fa-solid fa-chevron-down avatar-caret"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- Form Tambah Barang -->
+        <div style="background:var(--white);padding:24px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:24px;">
+            <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+                <i class="fa-solid fa-plus" style="color:var(--blue);"></i>
+                Tambah Barang Baru
+            </h2>
+            <form id="form-tambah" style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;">
+                <div style="flex:1;min-width:180px;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Nama Barang</label>
+                    <input type="text" id="input-nama" style="width:100%;border:1px solid var(--gray-200);padding:9px 12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray-800);outline:none;transition:border-color .2s;" placeholder="Misal: Mouse Wireless" required>
+                </div>
+                <div style="flex:1;min-width:180px;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Harga (Rp)</label>
+                    <input type="number" id="input-harga" style="width:100%;border:1px solid var(--gray-200);padding:9px 12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray-800);outline:none;transition:border-color .2s;" placeholder="Misal: 150000" required>
+                </div>
+                <div>
+                    <button type="submit" style="background:var(--blue);color:white;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;padding:9px 24px;border:none;border-radius:10px;cursor:pointer;transition:background .2s;">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Barang</th>
+                        <th>Harga</th>
+                    </tr>
+                </thead>
+                <tbody id="tabel-barang"></tbody>
+            </table>
+            <div class="pagination-bar">
+                <span class="pagination-info" id="pagination-info"></span>
+                <div class="pagination-btns" id="pagination-btns"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
