@@ -24,17 +24,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 body: formData
             });
 
-            const hasil = await response.json();
-            console.log("RESPON:", hasil);
+            const text = await response.text();
+            console.log("RAW RESPONSE:", text);
+
+            const hasil = JSON.parse(text);
 
             if (hasil.status === "success") {
-                alert("Berhasil tambah data");
+                alert("✅ Berhasil tambah data");
                 form.reset();
-
-                // refresh table tanpa reload
                 loadData();
             } else {
-                alert(hasil.message);
+                alert("❌ " + hasil.message);
             }
 
         } catch (err) {
@@ -44,29 +44,102 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-// GET DATA TABLE
+// ==========================
+// GET DATA
+// ==========================
 async function loadData() {
     try {
         const response = await fetch("http://localhost/Platform/api-toko/get_barang.php");
-        const hasil = await response.json();
+
+        if (!response.ok) {
+            throw new Error("HTTP ERROR " + response.status);
+        }
+
+        const text = await response.text();
+        console.log("RAW:", text);
+
+        const hasil = JSON.parse(text);
 
         let html = "";
 
         if (hasil.status === "success") {
-            hasil.data.forEach((barang, index) => {
+            hasil.data.forEach(barang => {
                 html += `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${barang.nama_barang}</td>
-                        <td>${barang.harga}</td>
-                    </tr>
+                <tr>
+                    <td>${barang.id}</td>
+                    <td>${barang.nama_barang}</td>
+                    <td>Rp ${barang.harga}</td>
+                    <td>
+                        <button onclick="hapusBarang(${barang.id})"
+                            style="
+                                width:32px;
+                                height:32px;
+                                background:#ef4444;
+                                color:white;
+                                border:none;
+                                border-radius:50%;
+                                cursor:pointer;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                                box-shadow:0 2px 6px rgba(0,0,0,0.2);
+                                transition:0.2s;
+                            "
+                            onmouseover="this.style.background='#dc2626'"
+                            onmouseout="this.style.background='#ef4444'"
+                        >
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
+                    </td>
+                </tr>
                 `;
             });
         }
 
         document.getElementById("tabel-barang").innerHTML = html;
 
+        // 🔥 WAJIB untuk render icon
+        feather.replace();
+
     } catch (err) {
-        console.error(err);
+        console.error("LOAD ERROR:", err);
+    }
+}
+
+
+// ==========================
+// HAPUS DATA
+// ==========================
+async function hapusBarang(id_target) {
+
+    const yakin = confirm(`🗑️ Yakin ingin menghapus data ID ${id_target}?`);
+
+    if (yakin) {
+        try {
+            // ✅ pakai POST biar aman di PHP
+            const formData = new FormData();
+            formData.append("id", id_target);
+
+            const response = await fetch('http://localhost/Platform/api-toko/hapus_barang.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            const text = await response.text();
+            console.log("RAW DELETE:", text);
+
+            const hasil = JSON.parse(text);
+
+            if (hasil.status === 'success') {
+                alert("🗑️ Data berhasil dihapus");
+                loadData();
+            } else {
+                alert('❌ ' + hasil.pesan);
+            }
+
+        } catch (error) {
+            console.error('ERROR DELETE:', error);
+            alert('❌ Gagal terhubung ke server.');
+        }
     }
 }
