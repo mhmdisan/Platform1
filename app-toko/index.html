@@ -23,11 +23,11 @@
             --gray-400: #9AA3B8;
             --gray-600: #5A6480;
             --gray-800: #1E2540;
-            --pending: #FF6B6B;
-            --dispatch: #1A56FF;
-            --completed: #22C55E;
             --radius: 16px;
             --shadow: 0 4px 24px rgba(26,86,255,0.08);
+            /* Warna mode Edit */
+            --amber: #D97706;
+            --amber-light: #FFFBEB;
         }
 
         body {
@@ -49,7 +49,6 @@
             top: 0; left: 0; bottom: 0;
             z-index: 100;
         }
-
         .logo {
             font-family: 'Syne', sans-serif;
             font-weight: 800;
@@ -59,7 +58,6 @@
             letter-spacing: -0.5px;
         }
         .logo span { color: rgba(255,255,255,0.55); }
-
         .nav-label {
             font-size: 10px;
             font-weight: 600;
@@ -68,7 +66,6 @@
             color: rgba(255,255,255,0.4);
             padding: 0 24px 10px;
         }
-
         .nav-item {
             display: flex;
             align-items: center;
@@ -89,7 +86,6 @@
             background: rgba(255,255,255,0.15);
             border-left-color: var(--white);
         }
-
         .sidebar-footer {
             margin-top: auto;
             padding: 16px 24px;
@@ -125,19 +121,13 @@
             top: 0;
             z-index: 50;
         }
-
         .page-title {
             font-family: 'Syne', sans-serif;
             font-size: 22px;
             font-weight: 700;
             color: var(--gray-800);
         }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
         .icon-btn {
             width: 36px; height: 36px;
             border-radius: 50%;
@@ -150,59 +140,126 @@
             transition: background .2s;
         }
         .icon-btn:hover { background: var(--gray-200); }
-        .avatar {
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--blue);
-        }
-        .avatar-wrap {
-            display: flex; align-items: center; gap: 6px;
-            cursor: pointer;
-        }
+        .avatar-wrap { display: flex; align-items: center; gap: 6px; cursor: pointer; }
         .avatar-caret { color: var(--gray-400); font-size: 12px; }
 
         /* ── CONTENT ── */
         .content { padding: 28px 32px; flex: 1; }
 
-        /* ── TABS + FILTERS ── */
-        .tabs {
-            display: flex;
-            gap: 4px;
+        /* ══════════════════════════════════════════
+           FORM CARD — berubah tampilan sesuai mode
+           ══════════════════════════════════════════ */
+        .form-card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            border-top: 4px solid var(--blue);   /* garis aksen atas */
+            transition: border-color .3s;
         }
-        .tab {
-            padding: 7px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--gray-400);
-            cursor: pointer;
-            border: none;
-            background: none;
-            transition: all .2s;
-        }
-        .tab:hover { color: var(--gray-800); }
-        .tab.active {
-            background: var(--blue);
-            color: var(--white);
-        }
+        /* Saat mode Edit, garis aksen berubah kuning */
+        .form-card.mode-edit { border-top-color: var(--amber); }
 
-        .date-filter {
+        .form-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
-            background: var(--white);
+        }
+        .form-title i { color: var(--blue); transition: color .3s; }
+        .form-card.mode-edit .form-title i { color: var(--amber); }
+
+        /* Label status mode (muncul saat Edit) */
+        .mode-badge {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            background: var(--amber-light);
+            color: var(--amber);
+            border: 1px solid #FCD34D;
+            border-radius: 20px;
+            padding: 3px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .form-card.mode-edit .mode-badge { display: inline-flex; }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+        }
+        .form-group { flex: 1; min-width: 180px; }
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin-bottom: 6px;
+        }
+        .form-input {
+            width: 100%;
+            border: 1px solid var(--gray-200);
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--gray-800);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .form-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(26,86,255,0.10);
+        }
+
+        .form-actions { display: flex; gap: 10px; }
+
+        /* Tombol Simpan — berubah warna saat mode Edit */
+        #btn-simpan {
+            background: var(--blue);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 9px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background .2s;
+        }
+        #btn-simpan:hover { filter: brightness(0.9); }
+        /* Mode Edit → amber/kuning */
+        #btn-simpan.mode-edit { background: var(--amber); }
+
+        /* Tombol Batal — hanya muncul saat Edit */
+        #btn-batal {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 9px 20px;
             border: 1px solid var(--gray-200);
             border-radius: 10px;
-            padding: 7px 14px;
-            font-size: 12.5px;
-            color: var(--gray-600);
             cursor: pointer;
-            transition: border-color .2s;
+            transition: background .2s;
         }
-        .date-filter:hover { border-color: var(--blue); }
-        .date-filter i { color: var(--blue); font-size: 13px; }
-        .date-sep { color: var(--gray-400); margin: 0 4px; }
+        #btn-batal:hover { background: var(--gray-200); }
 
         /* ── TABLE ── */
         .table-wrap {
@@ -211,12 +268,7 @@
             box-shadow: var(--shadow);
             overflow: hidden;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
+        table { width: 100%; border-collapse: collapse; }
         thead th {
             padding: 13px 16px;
             text-align: left;
@@ -227,20 +279,16 @@
             border-bottom: 1px solid var(--gray-100);
             white-space: nowrap;
         }
-        thead th.sortable { cursor: pointer; }
-        thead th.sortable i { font-size: 10px; margin-left: 4px; color: var(--gray-400); }
-
         tbody tr {
             border-bottom: 1px solid var(--gray-100);
             transition: background .15s;
         }
         tbody tr:last-child { border-bottom: none; }
         tbody tr:hover { background: var(--gray-50); }
-        tbody tr.highlight { background: var(--blue); }
-        tbody tr.highlight td { color: var(--white); }
-        tbody tr.highlight .status-badge.dispatch { background: rgba(255,255,255,0.25); color: var(--white); }
-        tbody tr.highlight .row-action { color: var(--white); opacity: .7; }
-        tbody tr.highlight .row-action:hover { opacity: 1; }
+
+        /* Baris yang sedang diedit diberi sorotan kuning */
+        tbody tr.row-editing { background: #FFFBEB !important; }
+        tbody tr.row-editing td { color: var(--gray-800); }
 
         td {
             padding: 14px 16px;
@@ -248,70 +296,11 @@
             color: var(--gray-800);
             vertical-align: middle;
         }
+        .actions-cell { display: flex; align-items: center; gap: 6px; }
 
-        .order-id {
-            font-weight: 700;
-            font-family: 'Syne', sans-serif;
-            font-size: 13px;
-        }
-
-        .user-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .user-avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-            background: var(--gray-200);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700;
-            font-size: 12px;
-            color: var(--blue);
-        }
-        .user-name { font-weight: 500; }
-
-        .address-cell {
-            color: var(--gray-600);
-            font-size: 12.5px;
-            max-width: 220px;
-        }
-
-        .price-cell { font-weight: 700; }
-
-        /* badges */
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11.5px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        .status-badge::before {
-            content: '';
-            width: 6px; height: 6px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .status-badge.pending { background: #FFF0F0; color: var(--pending); }
-        .status-badge.pending::before { background: var(--pending); }
-        .status-badge.dispatch { background: var(--blue-light); color: var(--blue); }
-        .status-badge.dispatch::before { background: var(--blue); }
-        .status-badge.completed { background: #F0FDF4; color: var(--completed); }
-        .status-badge.completed::before { background: var(--completed); }
-
-        .actions-cell {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        /* Tombol aksi di tabel */
         .row-action {
-            width: 30px; height: 30px;
+            width: 32px; height: 32px;
             border-radius: 8px;
             background: var(--gray-100);
             border: none;
@@ -322,6 +311,7 @@
             transition: all .2s;
         }
         .row-action:hover { background: var(--blue); color: var(--white); }
+        .row-action.delete:hover { background: #ef4444; color: var(--white); }
 
         /* ── PAGINATION ── */
         .pagination-bar {
@@ -349,17 +339,18 @@
         .page-btn.active { background: var(--blue); border-color: var(--blue); color: var(--white); }
         .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 
-        /* ── ANIMATE ── */
+        /* ── ANIMASI ── */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(12px); }
             to   { opacity: 1; transform: translateY(0); }
         }
         .table-wrap { animation: fadeUp .35s ease both; }
+        .form-card  { animation: fadeUp .25s ease both; }
     </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
+<!-- ══════════ SIDEBAR ══════════ -->
 <aside class="sidebar">
     <div class="logo">L<span>ist</span>K<span>u</span></div>
 
@@ -375,9 +366,9 @@
 </aside>
 
 
-
-<!-- MAIN -->
+<!-- ══════════ MAIN ══════════ -->
 <div class="main">
+
     <!-- TOPBAR -->
     <header class="topbar">
         <div class="page-title">Daftar Barang</div>
@@ -394,30 +385,63 @@
     <!-- CONTENT -->
     <div class="content">
 
-        <!-- Form Tambah Barang -->
-        <div style="background:var(--white);padding:24px;border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:24px;">
-            <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:16px;display:flex;align-items:center;gap:8px;">
-                <i class="fa-solid fa-plus" style="color:var(--blue);"></i>
-                Tambah Barang Baru
-            </h2>
-            <form id="form-tambah" style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;">
-                <div style="flex:1;min-width:180px;">
-                    <label style="display:block;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Nama Barang</label>
-                    <input type="text" id="input-nama" style="width:100%;border:1px solid var(--gray-200);padding:9px 12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray-800);outline:none;transition:border-color .2s;" placeholder="Misal: Mouse Wireless" required>
+        <!-- ══════════════════════════════════════════════
+             FORM TAMBAH / EDIT  — 1 FORM, 2 MODE
+             Konsep dosen: Hidden Input sebagai kantong
+             rahasia penentu mode POST vs PUT
+             ══════════════════════════════════════════════ -->
+        <div class="form-card" id="form-card">
+
+            <div class="form-title">
+                <i class="fa-solid fa-plus" id="form-icon"></i>
+                <span id="form-title-text">Tambah Barang Baru</span>
+                <!-- Badge mode Edit — tersembunyi saat mode Tambah -->
+                <span class="mode-badge" id="mode-badge">
+                    <i class="fa-solid fa-pen-to-square"></i> Mode Edit
+                </span>
+            </div>
+
+            <form id="form-tambah" class="form-row">
+
+                <!--
+                    ╔═══════════════════════════════════════════╗
+                    ║   INPUT HIDDEN — "Kantong Rahasia"        ║
+                    ║   Kosong ("")  → mode Tambah  (POST)      ║
+                    ║   Berisi angka → mode Update  (PUT)       ║
+                    ╚═══════════════════════════════════════════╝
+                -->
+                <input type="hidden" id="input-id">
+
+                <div class="form-group">
+                    <label class="form-label">Nama Barang</label>
+                    <input type="text" id="input-nama" class="form-input"
+                           placeholder="Misal: Mouse Wireless" required>
                 </div>
-                <div style="flex:1;min-width:180px;">
-                    <label style="display:block;font-size:11px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px;">Harga (Rp)</label>
-                    <input type="number" id="input-harga" style="width:100%;border:1px solid var(--gray-200);padding:9px 12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--gray-800);outline:none;transition:border-color .2s;" placeholder="Misal: 150000" required>
+
+                <div class="form-group">
+                    <label class="form-label">Harga (Rp)</label>
+                    <input type="number" id="input-harga" class="form-input"
+                           placeholder="Misal: 150000" min="1" required>
                 </div>
-                <div>
-                    <button type="submit" style="background:var(--blue);color:white;font-family:'DM Sans',sans-serif;font-weight:600;font-size:14px;padding:9px 24px;border:none;border-radius:10px;cursor:pointer;transition:background .2s;">
-                        Simpan
+
+                <div class="form-actions">
+                    <!-- Tombol Batal — hanya tampil saat mode Edit -->
+                    <button type="button" id="btn-batal" onclick="batalEdit()">
+                        <i class="fa-solid fa-xmark"></i> Batal
+                    </button>
+                    <!-- Tombol Simpan — teks & warna berubah sesuai mode -->
+                    <button type="submit" id="btn-simpan">
+                        <i class="fa-solid fa-floppy-disk" id="btn-icon"></i>
+                        <span id="btn-text">Simpan</span>
                     </button>
                 </div>
+
             </form>
         </div>
+        <!-- ═════════════ END FORM ═════════════ -->
 
-        <!-- TABLE -->
+
+        <!-- TABEL BARANG -->
         <div class="table-wrap">
             <table>
                 <thead>
@@ -425,6 +449,7 @@
                         <th>No</th>
                         <th>Nama Barang</th>
                         <th>Harga</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="tabel-barang"></tbody>
@@ -434,11 +459,12 @@
                 <div class="pagination-btns" id="pagination-btns"></div>
             </div>
         </div>
+
     </div>
 </div>
+
 <!-- Feather Icons -->
 <script src="https://unpkg.com/feather-icons"></script>
-
 <!-- App JS -->
 <script src="app.js"></script>
 </body>
