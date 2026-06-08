@@ -1,44 +1,37 @@
 <?php
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
+include "koneksi.php";
 
-$conn = new mysqli("localhost", "root", "", "db_toko");
+// =================== VALIDASI TOKEN ===================
+$headers = apache_request_headers();
+$token_dikirim = isset($headers['Authorization']) ? $headers['Authorization'] : '';
 
-if ($conn->connect_error) {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Koneksi gagal"
-    ]);
-    exit;
+if ($token_dikirim === '') {
+    die(json_encode(["status" => "error", "pesan" => "Akses Ditolak! Token tidak ditemukan."]));
 }
+
+$cek_token = mysqli_query($koneksi, "SELECT * FROM users WHERE token='$token_dikirim'");
+if (mysqli_num_rows($cek_token) === 0) {
+    die(json_encode(["status" => "error", "pesan" => "Akses Ditolak! Token tidak valid."]));
+}
+// ======================================================
 
 // Ambil data POST
-$nama = $_POST['nama_barang'] ?? '';
+$nama  = $_POST['nama_barang'] ?? '';
 $harga = $_POST['harga'] ?? '';
 
-// Validasi sederhana
 if ($nama == '' || $harga == '') {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Data tidak lengkap"
-    ]);
+    echo json_encode(["status" => "error", "pesan" => "Data tidak lengkap"]);
     exit;
 }
 
-// Insert
+$nama  = mysqli_real_escape_string($koneksi, $nama);
+$harga = mysqli_real_escape_string($koneksi, $harga);
+
 $query = "INSERT INTO barang (nama_barang, harga) VALUES ('$nama', '$harga')";
 
-if ($conn->query($query)) {
-    echo json_encode([
-        "status" => "success",
-        "message" => "Data berhasil ditambahkan"
-    ]);
+if (mysqli_query($koneksi, $query)) {
+    echo json_encode(["status" => "success", "pesan" => "Data barang berhasil ditambahkan!"]);
 } else {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Gagal insert"
-    ]);
+    echo json_encode(["status" => "error", "pesan" => "Gagal menyimpan ke database."]);
 }
-
-$conn->close();
 ?>

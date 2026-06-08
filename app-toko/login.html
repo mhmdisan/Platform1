@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — ListKu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --blue: #1A56FF;
+            --blue-dark: #1240D4;
+            --blue-light: #EEF2FF;
+            --white: #ffffff;
+            --gray-50: #F8F9FC;
+            --gray-100: #F1F3F9;
+            --gray-200: #E4E8F0;
+            --gray-400: #9AA3B8;
+            --gray-600: #5A6480;
+            --gray-800: #1E2540;
+            --radius: 16px;
+            --shadow: 0 4px 24px rgba(26,86,255,0.10);
+            --red: #ef4444;
+            --green: #22c55e;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background decorative blobs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -120px; left: -120px;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(26,86,255,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -100px; right: -100px;
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(26,86,255,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            max-width: 420px;
+            animation: fadeUp .35s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Brand */
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+        .brand-icon {
+            width: 44px; height: 44px;
+            background: var(--blue);
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            color: white;
+            box-shadow: 0 6px 20px rgba(26,86,255,0.35);
+        }
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 28px;
+            color: var(--gray-800);
+            letter-spacing: -0.5px;
+        }
+        .brand-name span { color: var(--blue); }
+
+        /* Card */
+        .auth-card {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: var(--shadow), 0 1px 3px rgba(0,0,0,0.06);
+            padding: 36px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .auth-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 6px;
+        }
+        .auth-subtitle {
+            font-size: 13.5px;
+            color: var(--gray-400);
+            margin-bottom: 28px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin-bottom: 7px;
+        }
+        .input-wrap {
+            position: relative;
+        }
+        .input-wrap i.icon-left {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 14px;
+            pointer-events: none;
+        }
+        .form-input {
+            width: 100%;
+            border: 1.5px solid var(--gray-200);
+            padding: 10px 12px 10px 38px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--gray-800);
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+            background: var(--gray-50);
+        }
+        .form-input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(26,86,255,0.10);
+            background: white;
+        }
+        .form-input.error {
+            border-color: var(--red);
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.10);
+        }
+
+        /* Password toggle */
+        .toggle-pw {
+            position: absolute;
+            right: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray-400);
+            font-size: 14px;
+            padding: 4px;
+            transition: color .2s;
+        }
+        .toggle-pw:hover { color: var(--blue); }
+
+        /* Submit button */
+        .btn-submit {
+            width: 100%;
+            background: var(--blue);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: 14.5px;
+            padding: 11px 22px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: filter .2s, transform .15s;
+            margin-top: 6px;
+        }
+        .btn-submit:hover { filter: brightness(0.92); }
+        .btn-submit:active { transform: scale(0.98); }
+        .btn-submit:disabled { opacity: .6; cursor: not-allowed; }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 22px 0;
+            color: var(--gray-400);
+            font-size: 12px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        /* Link */
+        .auth-link {
+            text-align: center;
+            font-size: 13.5px;
+            color: var(--gray-600);
+        }
+        .auth-link a {
+            color: var(--blue);
+            font-weight: 600;
+            text-decoration: none;
+            transition: color .2s;
+        }
+        .auth-link a:hover { color: var(--blue-dark); text-decoration: underline; }
+
+        /* ══ MODAL ══ */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(10,18,50,0.45);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn .2s ease;
+        }
+        .modal-backdrop.open { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal {
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(26,86,255,0.2);
+            padding: 32px;
+            width: 100%;
+            max-width: 360px;
+            text-align: center;
+            animation: popIn .25s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.88); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-icon {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px;
+            margin: 0 auto 16px;
+        }
+        .modal-icon.error { background: #FEF2F2; color: var(--red); }
+        .modal-icon.success { background: #F0FDF4; color: var(--green); }
+
+        .modal-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--gray-800);
+            margin-bottom: 8px;
+        }
+        .modal-msg {
+            font-size: 13.5px;
+            color: var(--gray-600);
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+        .modal-btn {
+            background: var(--blue);
+            color: white;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 10px 28px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: filter .2s;
+        }
+        .modal-btn:hover { filter: brightness(0.9); }
+        .modal-btn.danger { background: var(--red); }
+
+        /* Loading spinner on button */
+        .spinner {
+            width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin .6s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 480px) {
+            .auth-card { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-wrapper">
+    <!-- Brand -->
+    <div class="brand">
+        <div class="brand-icon"><i class="fa-solid fa-list-check"></i></div>
+        <div class="brand-name">List<span>Ku</span></div>
+    </div>
+
+    <!-- Card -->
+    <div class="auth-card">
+        <div class="auth-title">Selamat Datang!</div>
+        <div class="auth-subtitle">Masuk ke akun Anda untuk melanjutkan</div>
+
+        <form id="form-login" novalidate>
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-user icon-left"></i>
+                    <input type="text" id="username" class="form-input" placeholder="Masukkan username" autocomplete="username" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-wrap">
+                    <i class="fa-solid fa-lock icon-left"></i>
+                    <input type="password" id="password" class="form-input" placeholder="Masukkan password" autocomplete="current-password" required>
+                    <button type="button" class="toggle-pw" onclick="togglePassword('password', this)" tabindex="-1">
+                        <i class="fa-regular fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btn-login">
+                <i class="fa-solid fa-right-to-bracket"></i>
+                <span>Masuk</span>
+            </button>
+        </form>
+
+        <div class="divider">atau</div>
+
+        <div class="auth-link">
+            Belum punya akun? <a href="register.html">Daftar sekarang</a>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ERROR / SUCCESS -->
+<div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+        <div class="modal-icon" id="modal-icon">
+            <i id="modal-icon-i" class="fa-solid fa-circle-exclamation"></i>
+        </div>
+        <div class="modal-title" id="modal-title">Login Gagal</div>
+        <div class="modal-msg" id="modal-msg">Username atau password salah.</div>
+        <button class="modal-btn" id="modal-close-btn" onclick="closeModal()">Tutup</button>
+    </div>
+</div>
+
+<script>
+    // Cek jika sudah login
+    if (localStorage.getItem('token_toko')) {
+        window.location.href = 'index.html';
+    }
+
+    function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fa-regular fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fa-regular fa-eye';
+        }
+    }
+
+    function showModal(type, title, msg) {
+        const icon = document.getElementById('modal-icon');
+        const iconI = document.getElementById('modal-icon-i');
+        const closeBtn = document.getElementById('modal-close-btn');
+        icon.className = 'modal-icon ' + type;
+        iconI.className = type === 'error'
+            ? 'fa-solid fa-circle-exclamation'
+            : 'fa-solid fa-circle-check';
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-msg').textContent = msg;
+        closeBtn.className = type === 'error' ? 'modal-btn danger' : 'modal-btn';
+        document.getElementById('modal-backdrop').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('modal-backdrop').classList.remove('open');
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('modal-backdrop').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+
+    document.getElementById('form-login').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const btn = document.getElementById('btn-login');
+
+        if (!username || !password) {
+            showModal('error', 'Data Tidak Lengkap', 'Username dan password wajib diisi!');
+            return;
+        }
+
+        // Loading state
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner"></div><span>Memproses...</span>';
+
+        try {
+            const res = await fetch('http://localhost/Platform/api-toko/login.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const hasil = await res.json();
+
+            if (hasil.status === 'success') {
+                localStorage.setItem('token_toko', hasil.token);
+                localStorage.setItem('username_toko', hasil.username || username);
+                showModal('success', 'Login Berhasil!', 'Selamat datang kembali, ' + username + '!');
+                document.getElementById('modal-close-btn').onclick = function() {
+                    window.location.href = 'index.html';
+                };
+            } else {
+                showModal('error', 'Login Gagal', hasil.pesan || 'Username atau password salah!');
+            }
+        } catch (err) {
+            showModal('error', 'Koneksi Gagal', 'Tidak dapat terhubung ke server. Pastikan server menyala.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i><span>Masuk</span>';
+        }
+    });
+</script>
+</body>
+</html>
