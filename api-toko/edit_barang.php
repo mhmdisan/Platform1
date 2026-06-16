@@ -1,37 +1,105 @@
 <?php
 include "koneksi.php";
 
-// =================== VALIDASI TOKEN ===================
-$headers = apache_request_headers();
-$token_dikirim = isset($headers['Authorization']) ? $headers['Authorization'] : '';
+/* VALIDASI TOKEN */
+function getTokenFromHeader() {
+    if (function_exists('apache_request_headers')) {
+        $headers = apache_request_headers();
+
+        foreach ($headers as $key => $value) {
+            if (strtolower($key) === 'authorization') {
+                return trim($value);
+            }
+        }
+    }
+
+    if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        return trim($_SERVER['HTTP_AUTHORIZATION']);
+    }
+
+    return '';
+}
+
+$token_dikirim = getTokenFromHeader();
 
 if ($token_dikirim === '') {
-    die(json_encode(["status" => "error", "pesan" => "Akses Ditolak! Token tidak ditemukan."]));
+    die(json_encode([
+        "status" => "error",
+        "pesan" => "Akses Ditolak! Token tidak ditemukan."
+    ]));
 }
 
-$cek_token = mysqli_query($koneksi, "SELECT * FROM users WHERE token='$token_dikirim'");
+$cek_token = mysqli_query(
+    $koneksi,
+    "SELECT * FROM users WHERE token='$token_dikirim'"
+);
+
 if (mysqli_num_rows($cek_token) === 0) {
-    die(json_encode(["status" => "error", "pesan" => "Akses Ditolak! Token tidak valid."]));
+    die(json_encode([
+        "status" => "error",
+        "pesan" => "Akses Ditolak! Token tidak valid."
+    ]));
 }
-// ======================================================
 
-$json_data = file_get_contents("php://input");
-$data = json_decode($json_data, true);
+/* AMBIL DATA FORMDATA */
+$id    = $_POST['id'] ?? '';
+$nama  = $_POST['nama_barang'] ?? '';
+$harga = $_POST['harga'] ?? '';
 
-if (isset($data['id']) && isset($data['nama_barang']) && isset($data['harga'])) {
+if ($id == '' || $nama == '' || $harga == '') {
+    die(json_encode([
+        "status" => "error",
+        "pesan" => "Data tidak lengkap!"
+    ]));
+}
 
-    $id    = mysqli_real_escape_string($koneksi, $data['id']);
-    $nama  = mysqli_real_escape_string($koneksi, $data['nama_barang']);
-    $harga = mysqli_real_escape_string($koneksi, $data['harga']);
+$id    = mysqli_real_escape_string($koneksi, $id);
+$nama  = mysqli_real_escape_string($koneksi, $nama);
+$harga = mysqli_real_escape_string($koneksi, $harga);
 
-    $query = "UPDATE barang SET nama_barang='$nama', harga='$harga' WHERE id='$id'";
+/* CEK ADA GAMBAR BARU ATAU TIDAK */
+if (
+    isset($_FILES['gambar']) &&
+    $_FILES['gambar']['error'] === 0
+) {
 
-    if (mysqli_query($koneksi, $query)) {
-        echo json_encode(["status" => "success", "pesan" => "Data berhasil diperbarui!"]);
-    } else {
-        echo json_encode(["status" => "error", "pesan" => "Gagal mengupdate database."]);
-    }
+    $file_tmp = $_FILES['gambar']['tmp_name'];
+
+    $nama_file_baru =
+        time() . "_" . basename($_FILES['gambar']['name']);
+
+    move_uploaded_file(
+        $file_tmp,
+        "uploads/" . $nama_file_baru
+    );
+
+    $query = "
+        UPDATE barang
+        SET nama_barang='$nama',
+            harga='$harga',
+            gambar='$nama_file_baru'
+        WHERE id='$id'
+    ";
+
 } else {
-    echo json_encode(["status" => "error", "pesan" => "Data tidak lengkap!"]);
+
+    $query = "
+        UPDATE barang
+        SET nama_barang='$nama',
+            harga='$harga'
+        WHERE id='$id'
+    ";
+}
+
+if (mysqli_query($koneksi, $query)) {
+    echo json_encode([
+        "status" => "success",
+        "pesan" => "Data berhasil diperbarui!"
+    ]);
+} else {
+    echo json_encode([
+        "status" => "error",
+        "pesan" => "Gagal mengupdate database."
+    ]);
 }
 ?>
